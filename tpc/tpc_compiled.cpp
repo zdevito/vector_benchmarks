@@ -5,6 +5,7 @@
 #include <fstream>
 #include <stdint.h>
 #include <sys/time.h>
+#include <iostream>
 
 uint64_t readTime()
 {
@@ -40,84 +41,14 @@ int64_t* load_int(std::string name) {
 	return result;
 }
 
-double sum_op(int N, double* i) {
-	double s = 0;
-	for(int j = 0; j < N; j++) {
-		s += i[j];
-	}
-	return s;
+void print6(std::string name, double* v) {
+	std::cout << name << ": " << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3] << ", " << v[4] << ", " << v[5] << std::endl;
 }
 
-double* sum_op(int N, double* i, int64_t* group) {
-	double* result = new double[6];
-	for(int j = 0; j < 6; j++) result[j] = 0;
-	for(int j = 0; j < N; j++) {
-		result[group[j]] += i[j];
-	}
-	return result;
+void print6(std::string name, int64_t* v) {
+	std::cout << name << ": " << v[0] << ", " << v[1] << ", " << v[2] << ", " << v[3] << ", " << v[4] << ", " << v[5] << std::endl;
 }
 
-double* count_op(int N, int64_t* group) {
-	double* result = new double[6];
-	for(int j = 0; j < N; j++) {
-		result[group[j]]++;
-	}
-	return result;
-}
-
-double avg_op(int N, double* i) {
-	double s = 0;
-	for(int j = 0; j < N; j++) {
-		s += i[j];
-	}
-	return s / N;
-}
-
-double* avg_op(int N, double* i, int64_t* group) {
-	double* result = new double[6];
-	int64_t* cnt = new int64_t[6];
-	for(int j = 0; j < 6; j++) { result[j] = 0; cnt[j] = 0; }
-	for(int j = 0; j < N; j++) {
-		result[group[j]] += i[j];
-		cnt[group[j]]++;
-	}
-	for(int j = 0; j < 6; j++) result[j] /= cnt[j];
-	return result;
-}
-
-double sum_disc_price(int N, double* e, double* d) {
-	double s = 0;
-	for(int j = 0; j < N; j++) {
-		s += e[j] * (1.0-d[j]);
-	}
-	return s;
-}
-
-double* sum_disc_price(int N, double* e, double* d, int64_t* group) {
-	double* result = new double[6];
-	for(int j = 0; j < 6; j++) result[j] = 0;
-	for(int j = 0; j < N; j++) {
-		result[group[j]] += e[j] * (1.0-d[j]);
-	}
-	return result;
-}
-
-double sum_charge(int N, double* e, double* d, double* t) {
-	double s = 0;
-	for(int j = 0; j < N; j++) {
-		s += e[j] * (1.0-d[j]) * (1.0+t[j]);
-	}
-	return s;
-}
-
-double* sum_charge(int N, double* e, double* d, double* t, int64_t* group) {
-	double* result = new double[6];
-	for(int j = 0; j < 6; j++) result[j] = 0;
-	for(int j = 0; j < N; j++) {
-		result[group[j]] += e[j] * (1.0-d[j]) * (1.0+t[j]);
-	}
-	return result;
-}
 
 int main(int argc, char** argv) {
 
@@ -131,28 +62,47 @@ int main(int argc, char** argv) {
 	int64_t* l_returnflag = load_int("returnflag.bin");
 	int64_t* l_linestatus = load_int("linestatus.bin");
 
-	int64_t* group = new int64_t[N];
-	for(int i = 0; i < N; i++) {group[i] = (l_returnflag[i]+1) * (l_linestatus[i]+1) - 1;}
+	double sq[6], sbp[6], sdp[6], sc[6], aq[6], ap[6], ad[6];
+	int64_t count[6];
+
+	for(int i = 0; i < 6; i++) {
+		sq[i] = 0;
+		sbp[i] = 0;
+		sdp[i] = 0;
+		sc[i] = 0;
+		aq[i] = 0;
+		ap[i] = 0;
+		ad[i] = 0;
+		count[i] = 0;
+	}
 
 	start_timing();
-	
-	double* sq = sum_op(N, l_quantity, group);
-	printf("sum_qty: %f %f %f %f %f %f\n", sq[0], sq[1], sq[2], sq[3], sq[4], sq[5]);
-	sq = sum_op(N, l_extendedprice, group);
-	printf("sum_base_price: %f %f %f %f %f %f\n", sq[0], sq[1], sq[2], sq[3], sq[4], sq[5]);
-	sq = sum_disc_price(N, l_extendedprice, l_discount, group);
-	printf("sum_disc_price: %f %f %f %f %f %f\n", sq[0], sq[1], sq[2], sq[3], sq[4], sq[5]);
-	sq = sum_charge(N, l_extendedprice, l_discount, l_tax, group);
-	printf("sum_charge: %f %f %f %f %f %f\n", sq[0], sq[1], sq[2], sq[3], sq[4], sq[5]);
-	sq = avg_op(N, l_quantity, group);
-	printf("avg_qty: %f %f %f %f %f %f\n", sq[0], sq[1], sq[2], sq[3], sq[4], sq[5]);
-	sq = avg_op(N, l_extendedprice, group);
-	printf("avg_price: %f %f %f %f %f %f\n", sq[0], sq[1], sq[2], sq[3], sq[4], sq[5]);
-	sq = avg_op(N, l_discount, group);
-	printf("avg_disc: %f %f %f %f %f %f\n", sq[0], sq[1], sq[2], sq[3], sq[4], sq[5]);
-	sq = count_op(N, group);
-	printf("time: %f\n", end_timing());	
-	printf("count: %f %f %f %f %f %f\n", sq[0], sq[1], sq[2], sq[3], sq[4], sq[5]);
 
+	for(int i = 0; i < N; i++) {
+		int64_t group = (l_returnflag[i]+1) * (l_linestatus[i]+1) - 1;
+		sq[group] += l_quantity[i];
+		sbp[group] += l_extendedprice[i];
+		sdp[group] += l_extendedprice[i] * (1-l_discount[i]);
+		sc[group] += l_extendedprice[i] * (1-l_discount[i]) * (1+l_tax[i]);
+		ad[group] += l_discount[i];
+		count[group]++;
+	}
+	for(int i = 0; i < 6; i++) {
+		aq[i] = sq[i]/count[i];
+		ap[i] = sbp[i]/count[i];
+		ad[i] = ad[i]/count[i];
+	}
+
+	print6("sum_quantity", sq);	
+	print6("sum_base_price", sbp);	
+	print6("sum_disc_price", sdp);	
+	print6("sum_charge", sc);	
+	print6("avg_quantity", aq);	
+	print6("avg_price", ap);	
+	print6("avg_disc", ad);
+	print6("count", count);	
+
+	printf("time: %f\n", end_timing());	
+	
 	return 0;
 }
