@@ -20,6 +20,9 @@ long_interpreter:	long_interpreter.cpp
 long_to_short_interpreter:	long_to_short_interpreter.cpp
 	$(GCC) $(GCCFLAGS) $< -o $@
 
+shortr:	short.cpp
+	$(GCC) $(GCCFLAGS) $< -o $@
+
 	
 clean:
 	rm $(TESTS)
