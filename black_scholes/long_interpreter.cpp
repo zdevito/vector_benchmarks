@@ -2,7 +2,7 @@
 #include <math.h>
 #include <vector>
 
-#define VL (256 * 256)
+#define VL (256*256)
 #define ROUNDS 20
 
 
@@ -185,7 +185,7 @@ void sel_op(Value* s, Value* a, Value** bptr) {
 void PR(const char * op, int i) {
 	Value * rhs = registers[i];
 	printf("%s v[%d][%d] = { ",op,i,rhs->size);
-	for(int j = 0; j < rhs->size; j++)
+	for(int j = 0; j < 10; j++)
 		printf("%f ",rhs->data[j]);
 	printf("}\n");
 }
