@@ -21,16 +21,11 @@ void neg_op(double* i, double* o) {
 	}
 }
 
-// some defines first
 union ieee754_QNAN
 {
-   const double f;
-   struct 
-   {
-      const uint64_t mantissa:52, exp:11, sign:1; 
-   };
-   
-   ieee754_QNAN() : f(0.0), mantissa(0xFFFFFFFFFFFFF), exp(0x7FF), sign(0x0) {}
+	uint64_t i;
+	double f;
+	ieee754_QNAN() : i(0x7FFFFFFFFFFFFFFF) {}
 };
 
 const ieee754_QNAN absMask; 

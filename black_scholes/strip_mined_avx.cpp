@@ -18,20 +18,11 @@ void neg_op(double* i, double* o) {
 	}
 }
 
-// some defines first
 union ieee754_QNAN
 {
-   const double f;
-   struct 
-   {
-      uint64_t mantissa:52, exp:11, sign:1; 
-   };
-   
-   ieee754_QNAN() : f(0.0) {
-	 mantissa = 0xFFFFFFFFFFFFF;
-	exp = 0x7FF;
-	sign = 0x0;
-   } 
+	uint64_t i;
+	double f;
+	ieee754_QNAN() : i(0x7FFFFFFFFFFFFFFF) {}
 };
 
 const ieee754_QNAN absMask; 
@@ -121,12 +112,45 @@ void mul_op(double* a, double* b, double* o) {
 }
 
 template<int N>
+void muladd_op(double* a, double* b, double* o) {
+	__m256d* xa = (__m256d*)a;
+	__m256d* xb = (__m256d*)b;
+	__m256d* xo = (__m256d*)o;
+	for(int j = 0; j < N/2; j++) {
+		xo[j] = _mm256_add_pd(xo[j], _mm256_mul_pd(xa[j], xb[j]));
+		//o[j] = a[j] * b[j];
+	}
+}
+
+template<int N>
 void muls_op(double* a, double b, double* o) {
 	__m256d* xa = (__m256d*)a;
 	__m256d xb = _mm256_set1_pd(b);
 	__m256d* xo = (__m256d*)o;
 	for(int j = 0; j < N/4; j++) {
 		xo[j] = _mm256_mul_pd(xa[j], xb);
+		//o[j] = a[j] * b;
+	}
+}
+
+template<int N>
+void addsmul_op(double a, double* b, double* o) {
+	__m256d xa = _mm256_set1_pd(a);
+	__m256d* xb = (__m256d*)b;
+	__m256d* xo = (__m256d*)o;
+	for(int j = 0; j < N/2; j++) {
+		xo[j] = _mm256_mul_pd(xb[j], _mm256_add_pd(xo[j], xa));
+		//o[j] = a[j] * b;
+	}
+}
+
+template<int N>
+void muladds_op(double* a, double b, double* o) {
+	__m256d* xa = (__m256d*)a;
+	__m256d xb = _mm256_set1_pd(b);
+	__m256d* xo = (__m256d*)o;
+	for(int j = 0; j < N/2; j++) {
+		xo[j] = _mm256_add_pd(xb, _mm256_mul_pd(xa[j], xo[j]));
 		//o[j] = a[j] * b;
 	}
 }
@@ -139,6 +163,28 @@ void div_op(double* a, double* b, double* o) {
 	for(int j = 0; j < N/4; j++) {
 		xo[j] = _mm256_setzero_pd();
 		//xo[j] = _mm256_div_pd(xa[j], xb[j]);
+		//o[j] = a[j] / b[j];
+	}
+}
+
+template<int N>
+void divs_op(double* a, double b, double* o) {
+	__m256d* xa = (__m256d*)a;
+	__m256d xb = _mm256_set1_pd(b);
+	__m256d* xo = (__m256d*)o;
+	for(int j = 0; j < N/2; j++) {
+		xo[j] = _mm256_div_pd(xa[j], xb);
+		//o[j] = a[j] / b[j];
+	}
+}
+
+template<int N>
+void rcp_op(double* a, double* o) {
+	__m256d* xa = (__m256d*)a;
+	__m256d xb = _mm256_set1_pd(1.0);
+	__m256d* xo = (__m256d*)o;
+	for(int j = 0; j < N/2; j++) {
+		xo[j] = _mm256_div_pd(xb, xa[j]);
 		//o[j] = a[j] / b[j];
 	}
 }
@@ -301,7 +347,7 @@ int main(int argc, char** argv) {
 	start_timing();
 	double sum = 0;
 	for(int i = 0; i < ROUNDS; i++) {
-		sum += run(98, 2, 0.02, 5);
+		sum += run(100, 98, 2, 0.02, 5);
 	}
 	printf("%f \t(%f)\n", end_timing(), sum / (LENGTH * ROUNDS));
 

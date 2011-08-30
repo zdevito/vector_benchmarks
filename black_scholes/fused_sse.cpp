@@ -1,19 +1,15 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <xmmintrin.h>
 #include "../timing.h"
 
-// some defines first
 union ieee754_QNAN
 {
-   const double f;
-   struct
-   {
-      const uint64_t mantissa:52, exp:11, sign:1;
-   };
-
-   ieee754_QNAN() : f(0.0), mantissa(0xFFFFFFFFFFFFF), exp(0x7FF), sign(0x0) {}
+	uint64_t i;
+	double f;
+	ieee754_QNAN() : i(0x7FFFFFFFFFFFFFFF) {}
 };
 
 const ieee754_QNAN absMask;
@@ -73,7 +69,6 @@ double run(double S, double X, double T, double r, double v) {
 	__m128d _r = _mm_set1_pd(r);
 	__m128d _v = _mm_set1_pd(v);
 	for(int j = 0; j < LENGTH/2; j++) {
-		// If we just use S, the compiler will lift this out of the loop.
 		sum = _mm_add_pd(sum, body(_S, _X, _T, _r, _v));
 	}
 	return ((double*)&sum)[0] + ((double*)&sum)[1];
