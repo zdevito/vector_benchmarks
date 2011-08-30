@@ -1,6 +1,6 @@
 GCCFLAGS=-O3 -msse4 -DNDEBUG -funroll-loops -DROUNDS=20 -DLENGTH=4194304
 GCCFLAGS += $(FLAGS)
-GCC=icc
+GCC=g++
 
 TESTS = fused fused_sse strip_mined strip_mined_sse
 
