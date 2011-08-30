@@ -234,7 +234,7 @@ void sel_op(double const* s, double const* a, double const* b, double* o) {
 template<int N>
 double* getV() {
 	double* d = new double[N+1];
-	return (double*)(((int64_t)(d+1))>>5<<5);
+	return (double*)(((int64_t)(d+3))>>5<<5);
 }
 
 double* t0 = getV<VW>();
@@ -330,11 +330,11 @@ double run(double* S, double* X, double* T, double* r, double* v) {
 
 int main(int argc, char** argv) {
 
-	double* S = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
-	double* X = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
-	double* T = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
-	double* r = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
-	double* v = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
+	double* S = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 5 << 5);
+	double* X = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 5 << 5);
+	double* T = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 5 << 5);
+	double* r = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 5 << 5);
+	double* v = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 5 << 5);
 	
 	for(int i = 0; i < LENGTH; i++) {
 		S[i] = 100;
