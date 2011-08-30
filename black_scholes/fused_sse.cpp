@@ -33,30 +33,34 @@ static inline __m128d _mm_blendv_pd(__m128d a, __m128d b, __m128d c) {
         return _mm_or_pd(_mm_andnot_pd(c, a), _mm_and_pd(c, b));
 }
 
+
+
+double d_cnd[2];
+double d_body[2];
+
 __attribute__ ((always_inline))
 __m128d cnd(__m128d X) {
-	double d[2];
 	__m128d L = _mm_and_pd(abs4Mask, X);
 	__m128d k = _mm_div_pd(one, _mm_add_pd(one, _mm_mul_pd(mul, L)));
 	__m128d w = _mm_mul_pd(_mm_add_pd(_mm_mul_pd(_mm_add_pd(_mm_mul_pd(_mm_add_pd(_mm_mul_pd(_mm_add_pd(_mm_mul_pd(k1, k), k2), k), k3), k), k4), k), k5), k);
-	_mm_store_pd(d, _mm_mul_pd(_mm_mul_pd(L, L), neghalf));
-	d[0] = exp(d[0]); d[1] = exp(d[1]);
-	w = _mm_mul_pd(_mm_mul_pd(w, invSqrt2Pi), _mm_load_pd(d));
+	_mm_store_pd(d_cnd, _mm_mul_pd(_mm_mul_pd(L, L), neghalf));
+	d_cnd[0] = exp(d_cnd[0]); d_cnd[1] = exp(d_cnd[1]);
+	w = _mm_mul_pd(_mm_mul_pd(w, invSqrt2Pi), _mm_load_pd(d_cnd));
 	__m128d mask = _mm_cmpgt_pd(X, zero);
 	return _mm_blendv_pd(w, _mm_sub_pd(one, w), mask); 
 }
 
+
 __attribute__ ((always_inline))
 __m128d body(__m128d S, __m128d X, __m128d T, __m128d r, __m128d v) {
-	double d[2];
 	__m128d tmp = _mm_mul_pd(v, _mm_sqrt_pd(T));
-	_mm_store_pd(d, _mm_div_pd(S, X));
-	d[0] = log(d[0]); d[1] = log(d[1]);
-	__m128d d1 = _mm_div_pd(_mm_add_pd(_mm_div_pd(_mm_load_pd(d), Log10), _mm_mul_pd(_mm_add_pd(r, _mm_mul_pd(v, _mm_mul_pd(v, half))), T)), tmp);
+	_mm_store_pd(d_body, _mm_div_pd(S, X));
+	d_body[0] = log(d_body[0]); d_body[1] = log(d_body[1]);
+	__m128d d1 = _mm_div_pd(_mm_add_pd(_mm_div_pd(_mm_load_pd(d_body), Log10), _mm_mul_pd(_mm_add_pd(r, _mm_mul_pd(v, _mm_mul_pd(v, half))), T)), tmp);
 	__m128d d2 = _mm_sub_pd(d1, tmp);
-	_mm_store_pd(d, _mm_mul_pd(_mm_sub_pd(zero, r), T));
-	d[0] = exp(d[0]); d[1] = exp(d[1]);
-	__m128d result = _mm_sub_pd(_mm_mul_pd(S, cnd(d1)), _mm_mul_pd(X, _mm_mul_pd(_mm_load_pd(d), cnd(d2))));
+	_mm_store_pd(d_body, _mm_mul_pd(_mm_sub_pd(zero, r), T));
+	d_body[0] = exp(d_body[0]); d_body[1] = exp(d_body[1]);
+	__m128d result = _mm_sub_pd(_mm_mul_pd(S, cnd(d1)), _mm_mul_pd(X, _mm_mul_pd(_mm_load_pd(d_body), cnd(d2))));
 	return result;
 }
 
@@ -70,7 +74,6 @@ double run(double* S, double* X, double* T, double* r, double* v) {
 }
 
 int main(int argc, char** argv) {
-
 	double* S = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
 	double* X = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
 	double* T = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
