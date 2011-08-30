@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
@@ -12,119 +13,119 @@
 #define VW (BLOCK)
 
 template<int N>
-void neg_op(double* i, double* o) {
+void neg_op(double const* i, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = -i[j];
 	}
 }
 
 template<int N>
-void abs_op(double* i, double* o) {
+void abs_op(double const* i, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = fabs(i[j]);
 	}
 }
 
 template<int N>
-void log_op(double* i, double* o) {
+void log_op(double const* i, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = log(i[j]);
 	}
 }
 
 template<int N>
-void exp_op(double* i, double* o) {
+void exp_op(double const* i, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = exp(i[j]);
 	}
 }
 
 template<int N>
-void sqrt_op(double* i, double* o) {
+void sqrt_op(double const* i, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = sqrt(i[j]);
 	}
 }
 
 template<int N>
-void add_op(double* a, double* b, double* o) {
+void add_op(double const* a, double const* b, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = a[j] + b[j];
 	}
 }
 
 template<int N>
-void adds_op(double* a, double b, double* o) {
+void adds_op(double const* a, double b, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = a[j] + b;
 	}
 }
 
 template<int N>
-void sub_op(double* a, double* b, double* o) {
+void sub_op(double const* a, double const* b, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = a[j] - b[j];
 	}
 }
 
 template<int N>
-void mul_op(double* a, double* b, double* o) {
+void mul_op(double const* a, double const* b, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = a[j] * b[j];
 	}
 }
 
 template<int N>
-void muladd_op(double* a, double* b, double* o) {
+void muladd_op(double const* a, double const* b, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] += a[j] * b[j];
 	}
 }
 
 template<int N>
-void muls_op(double* a, double b, double* o) {
+void muls_op(double const* a, double b, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = a[j] * b;
 	}
 }
 
 template<int N>
-void mulsadd_op(double* a, double b, double* o) {
+void mulsadd_op(double const* a, double b, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] += a[j] * b;
 	}
 }
 
 template<int N>
-void addsmul_op(double a, double* b, double* o) {
+void addsmul_op(double a, double const* b, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = (o[j] + a) * b[j];
 	}
 }
 
 template<int N>
-void muladds_op(double* a, double b, double* o) {
+void muladds_op(double const* a, double b, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = (o[j]*a[j]) + b;
 	}
 }
 
 template<int N>
-void div_op(double* a, double* b, double* o) {
+void div_op(double const* a, double const* b, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = a[j] / b[j];
 	}
 }
 
 template<int N>
-void divs_op(double* a, double b, double* o) {
+void divs_op(double const* a, double b, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = a[j] / b;
 	}
 }
 
 template<int N>
-void rcp_op(double* a, double* o) {
+void rcp_op(double const* a, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = 1.0 / a[j];
 	}
@@ -138,7 +139,7 @@ void rep_op(double d, double* o) {
 }
 
 template<int N>
-double sum_op(double* i) {
+double sum_op(double const* i) {
 	double s = 0;
 	for(int j = 0; j < N; j++) {
 		s += i[j];
@@ -147,14 +148,14 @@ double sum_op(double* i) {
 }
 
 template<int N>
-void gt0_op(double* i, double*o ) {
+void gt0_op(double const* i, double*o ) {
 	for(int j = 0; j < N; j++) {
 		o[j] = i[j] > 0 ? 1.0 : 0.0;
 	}
 }
 
 template<int N>
-void sel_op(double* s, double* a, double* b, double* o) {
+void sel_op(double const* s, double const* a, double const* b, double* o) {
 	for(int j = 0; j < N; j++) {
 		o[j] = s[j] == 0 ? a[j] : b[j];
 	}
@@ -203,24 +204,11 @@ double* cnd(double* X) {
 	return t0;
 }
 
-double* S = getV<VW>();
-double* X = getV<VW>();
-double* T = getV<VW>();
-double* r = getV<VW>();
-double* v = getV<VW>();
 double* s0 = getV<VW>();
 double* s1 = getV<VW>();
 double* s2 = getV<VW>();
 
-double global = 0;
-	
-double body(double _S, double _X, double _T, double _r, double _v) {
-	global++;		// Avoid LICM 
-	rep_op<VW>(_S, S);
-	rep_op<VW>(_X, X);
-	rep_op<VW>(_T, T);
-	rep_op<VW>(_r, r);
-	rep_op<VW>(_v, v);
+double body(double const* S, double const* X, double const* T, double const* r, double const* v) {
 
 	// log(S/X)/2.302585
 	div_op<VW>(S, X, s0);
@@ -262,24 +250,37 @@ double body(double _S, double _X, double _T, double _r, double _v) {
 }
 
 __attribute__ ((noinline))
-double run(double S, double X, double T, double r, double v) {
+double run(double* S, double* X, double* T, double* r, double* v) {
 	double sum = 0;
-	for(int j = 0; j < (LENGTH)/(BLOCK); j++) {
-		sum += body(S, X, T, r, v);
+	for(int j = 0; j < LENGTH; j+=BLOCK) {
+		sum += body(S+j, X+j, T+j, r+j, v+j);
 	}
 	return sum;
 }
 
 int main(int argc, char** argv) {
+
+	double* S = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
+	double* X = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
+	double* T = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
+	double* r = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
+	double* v = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
 	
+	for(int i = 0; i < LENGTH; i++) {
+		S[i] = 100;
+		X[i] = 98;
+		T[i] = 2;
+		r[i] = 0.02;
+		v[i] = 5;
+	}
+
 	start_timing();
 	double sum = 0;
 	for(int i = 0; i < ROUNDS; i++) {
-		sum += run(100, 98, 2, 0.02, 5);
+		sum += run(S, X, T, r, v);
 	}
 	printf("%f \t(%f)\n", end_timing(), sum / (LENGTH * ROUNDS));
 
 	return 0;
 }
-
 
