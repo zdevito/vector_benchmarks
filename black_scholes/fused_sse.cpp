@@ -1,4 +1,4 @@
-
+#include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -61,28 +61,38 @@ __m128d body(__m128d S, __m128d X, __m128d T, __m128d r, __m128d v) {
 }
 
 __attribute__ ((noinline))
-double run(double S, double X, double T, double r, double v) {
+double run(double* S, double* X, double* T, double* r, double* v) {
 	__m128d sum = _mm_set1_pd(0);
-	__m128d _S = _mm_set1_pd(S);
-	__m128d _X = _mm_set1_pd(X);
-	__m128d _T = _mm_set1_pd(T);
-	__m128d _r = _mm_set1_pd(r);
-	__m128d _v = _mm_set1_pd(v);
-	for(int j = 0; j < LENGTH/2; j++) {
-		sum = _mm_add_pd(sum, body(_S, _X, _T, _r, _v));
+	for(int j = 0; j < LENGTH; j+=2) {
+		sum = _mm_add_pd(sum, body(_mm_load_pd(S+j), _mm_load_pd(X+j), _mm_load_pd(T+j), _mm_load_pd(r+j), _mm_load_pd(v+j)));
 	}
 	return ((double*)&sum)[0] + ((double*)&sum)[1];
 }
 
 int main(int argc, char** argv) {
+
+	double* S = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
+	double* X = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
+	double* T = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
+	double* r = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
+	double* v = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
 	
+	for(int i = 0; i < LENGTH; i++) {
+		S[i] = 100;
+		X[i] = 98;
+		T[i] = 2;
+		r[i] = 0.02;
+		v[i] = 5;
+	}
+
 	start_timing();
 	double sum = 0;
 	for(int i = 0; i < ROUNDS; i++) {
-		sum += run(100, 98, 2, 0.02, 5);
+		sum += run(S, X, T, r, v);
 	}
 	printf("%f \t(%f)\n", end_timing(), sum / (LENGTH * ROUNDS));
 
 	return 0;
 }
+
 

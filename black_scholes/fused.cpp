@@ -1,4 +1,4 @@
-
+#include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
 #include "../timing.h"
@@ -26,20 +26,34 @@ double body(double S, double X, double T, double r, double v) {
 }
 
 __attribute__ ((noinline))
-double run(double S, double X, double T, double r, double v) {
+double run(double* S, double* X, double* T, double* r, double* v) {
 	double sum = 0;
 	for(int j = 0; j < LENGTH; j++) {
-		sum += body(S, X, T, r, v);
+		sum += body(S[j], X[j], T[j], r[j], v[j]);
 	}
 	return sum;
 }
 
 int main(int argc, char** argv) {
+
+	double* S = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
+	double* X = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
+	double* T = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
+	double* r = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
+	double* v = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
 	
+	for(int i = 0; i < LENGTH; i++) {
+		S[i] = 100;
+		X[i] = 98;
+		T[i] = 2;
+		r[i] = 0.02;
+		v[i] = 5;
+	}
+
 	start_timing();
 	double sum = 0;
 	for(int i = 0; i < ROUNDS; i++) {
-		sum += run(100, 98, 2, 0.02, 5);
+		sum += run(S, X, T, r, v);
 	}
 	printf("%f \t(%f)\n", end_timing(), sum / (LENGTH * ROUNDS));
 
