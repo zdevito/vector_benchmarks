@@ -13,15 +13,12 @@ double cnd(double X) {
 	return X > 0 ? 1.0-w : w;
 }
 
-double global = 0;
-
 __attribute__ ((always_inline))
 double body(double S, double X, double T, double r, double v) {
 	double tmp = v * sqrt(T);
 	double d1 = (log(S/X)/2.302585 + (r+v*v*0.5)*T) / tmp;
 	double d2 = d1 - tmp;
 	double result = S * cnd(d1) - X * exp(-r * T) * cnd(d2);
-	global += result; // avoid some loop invariant code motion
 	return result;
 }
 
