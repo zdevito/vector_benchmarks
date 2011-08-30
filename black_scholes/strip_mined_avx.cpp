@@ -324,11 +324,11 @@ double run(double* S, double* X, double* T, double* r, double* v) {
 
 int main(int argc, char** argv) {
 
-	double* S = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 5 << 5);
-	double* X = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 5 << 5);
-	double* T = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 5 << 5);
-	double* r = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 5 << 5);
-	double* v = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 5 << 5);
+	double* S = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
+	double* X = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
+	double* T = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
+	double* r = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
+	double* v = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
 	
 	for(int i = 0; i < LENGTH; i++) {
 		S[i] = 100;
