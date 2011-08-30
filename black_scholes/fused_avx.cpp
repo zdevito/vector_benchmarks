@@ -33,30 +33,32 @@ static inline __m256d _mm256_blendv_pd(__m256d a, __m256d b, __m256d c) {
         return _mm256_or_pd(_mm256_andnot_pd(c, a), _mm256_and_pd(c, b));
 }
 
+double * d_cnd;
+double * d_body;
 __attribute__ ((always_inline))
 __m256d cnd(__m256d X) {
-	double d[2];
+ 
 	__m256d L = _mm256_and_pd(abs4Mask, X);
 	__m256d k = _mm256_div_pd(one, _mm256_add_pd(one, _mm256_mul_pd(mul, L)));
 	__m256d w = _mm256_mul_pd(_mm256_add_pd(_mm256_mul_pd(_mm256_add_pd(_mm256_mul_pd(_mm256_add_pd(_mm256_mul_pd(_mm256_add_pd(_mm256_mul_pd(k1, k), k2), k), k3), k), k4), k), k5), k);
-	_mm256_store_pd(d, _mm256_mul_pd(_mm256_mul_pd(L, L), neghalf));
-	d[0] = exp(d[0]); d[1] = exp(d[1]);
-	w = _mm256_mul_pd(_mm256_mul_pd(w, invSqrt2Pi), _mm256_load_pd(d));
+	_mm256_store_pd(d_cnd, _mm256_mul_pd(_mm256_mul_pd(L, L), neghalf));
+	d_cnd[0] = exp(d_cnd[0]); d_cnd[1] = exp(d_cnd[1]); d_cnd[2] = exp(d_cnd[2]); d_cnd[3] = exp(d_cnd[3]);
+	w = _mm256_mul_pd(_mm256_mul_pd(w, invSqrt2Pi), _mm256_load_pd(d_cnd));
 	__m256d mask = _mm256_cmpgt_pd(X, zero);
 	return _mm256_blendv_pd(w, _mm256_sub_pd(one, w), mask); 
 }
 
 __attribute__ ((always_inline))
 __m256d body(__m256d S, __m256d X, __m256d T, __m256d r, __m256d v) {
-	double d[2];
+    
 	__m256d tmp = _mm256_mul_pd(v, _mm256_sqrt_pd(T));
-	_mm256_store_pd(d, _mm256_div_pd(S, X));
-	d[0] = log(d[0]); d[1] = log(d[1]);
-	__m256d d1 = _mm256_div_pd(_mm256_add_pd(_mm256_div_pd(_mm256_load_pd(d), Log10), _mm256_mul_pd(_mm256_add_pd(r, _mm256_mul_pd(v, _mm256_mul_pd(v, half))), T)), tmp);
+	_mm256_store_pd(d_body, _mm256_div_pd(S, X));
+	d_body[0] = log(d_body[0]); d_body[1] = log(d_body[1]); d_body[2] = log(d_body[2]); d_body[3] = log(d_body[3]);
+	__m256d d1 = _mm256_div_pd(_mm256_add_pd(_mm256_div_pd(_mm256_load_pd(d_body), Log10), _mm256_mul_pd(_mm256_add_pd(r, _mm256_mul_pd(v, _mm256_mul_pd(v, half))), T)), tmp);
 	__m256d d2 = _mm256_sub_pd(d1, tmp);
-	_mm256_store_pd(d, _mm256_mul_pd(_mm256_sub_pd(zero, r), T));
-	d[0] = exp(d[0]); d[1] = exp(d[1]);
-	__m256d result = _mm256_sub_pd(_mm256_mul_pd(S, cnd(d1)), _mm256_mul_pd(X, _mm256_mul_pd(_mm256_load_pd(d), cnd(d2))));
+	_mm256_store_pd(d_body, _mm256_mul_pd(_mm256_sub_pd(zero, r), T));
+	d_body[0] = exp(d_body[0]); d_body[1] = exp(d_body[1]); d_body[2] = exp(d_body[2]); d_body[3] = exp(d_body[3]);
+	__m256d result = _mm256_sub_pd(_mm256_mul_pd(S, cnd(d1)), _mm256_mul_pd(X, _mm256_mul_pd(_mm256_load_pd(d_body), cnd(d2))));
 	return result;
 }
 
@@ -70,12 +72,13 @@ double run(double* S, double* X, double* T, double* r, double* v) {
 }
 
 int main(int argc, char** argv) {
-
-	double* S = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
-	double* X = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
-	double* T = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
-	double* r = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
-	double* v = (double*)((uint64_t)malloc(sizeof(double)*LENGTH+3) >> 4 << 4);
+  d_cnd = (double*)((uint64_t)malloc(sizeof(double)*12) >> 5 << 5);
+  d_body = (double*) ((uint64_t) malloc(sizeof(double)*12) >> 5 << 5);
+  double* S = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
+  double* X = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
+  double* T = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
+  double* r = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
+  double* v = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
 	
 	for(int i = 0; i < LENGTH; i++) {
 		S[i] = 100;
