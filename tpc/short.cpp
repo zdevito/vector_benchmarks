@@ -7,7 +7,7 @@
 #include <fstream>
 #include <sys/time.h>
 
-#define VECTOR_WIDTH 256
+#define VECTOR_WIDTH 4
 #define NOINLINE __attribute__ ((noinline))
 
 uint64_t readTime()

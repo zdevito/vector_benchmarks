@@ -1,0 +1,92 @@
+rm $1
+make -s test FLAGS=-DBLOCK=1
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=2
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=4
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=8
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=16
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=32
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=64
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=128
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=256
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=512
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=1024
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=2048
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=4096
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=8192
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=16384
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=32768
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=65536
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=131072
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=262144
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=524288
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=1048576
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=2097152
+./$1
+
+rm $1
+make -s test FLAGS=-DBLOCK=4194304
+./$1
+

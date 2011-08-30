@@ -1,8 +1,9 @@
  #include <stdio.h>
 #include <math.h>
 #include <vector>
+#include <stdlib.h>
 
-#define VL (256*256)
+#define VL (1024*1024)
 #define ROUNDS 20
 
 
