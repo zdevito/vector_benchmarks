@@ -40,19 +40,15 @@ void abs_op(double const* i, double* o) {
 
 template<int N>
 void log_op(double const* i, double* o) {
-	__m256d* xo = (__m256d*)o;
-	for(int j = 0; j < N/4; j++) {
-		xo[j] = _mm256_setzero_pd();
-		//o[j] = log(i[j]);
+	for(int j = 0; j < N; j++) {
+		o[j] = log(i[j]);
 	}
 }
 
 template<int N>
 void exp_op(double const* i, double* o) {
-	__m256d* xo = (__m256d*)o;
-	for(int j = 0; j < N/4; j++) {
-		xo[j] = _mm256_setzero_pd();
-		//o[j] = exp(i[j]);
+	for(int j = 0; j < N; j++) {
+		o[j] = exp(i[j]);
 	}
 }
 
@@ -61,8 +57,7 @@ void sqrt_op(double const* i, double* o) {
 	__m256d* xi = (__m256d*)i;
 	__m256d* xo = (__m256d*)o;
 	for(int j = 0; j < N/4; j++) {
-		xo[j] = _mm256_setzero_pd();
-		//xo[j] = _mm256_sqrt_pd(xi[j]);
+		xo[j] = _mm256_sqrt_pd(xi[j]);
 		//o[j] = sqrt(i[j]);
 	}
 }
@@ -161,8 +156,7 @@ void div_op(double const* a, double const* b, double* o) {
 	__m256d* xb = (__m256d*)b;
 	__m256d* xo = (__m256d*)o;
 	for(int j = 0; j < N/4; j++) {
-		xo[j] = _mm256_setzero_pd();
-		//xo[j] = _mm256_div_pd(xa[j], xb[j]);
+		xo[j] = _mm256_div_pd(xa[j], xb[j]);
 		//o[j] = a[j] / b[j];
 	}
 }
