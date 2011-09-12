@@ -1,9 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <math.h>
+#include "blackscholes.h"
 #include <xmmintrin.h>
-#include "../timing.h"
 
 #define VW (BLOCK)
 
@@ -239,36 +235,31 @@ void sel_op(double const* s, double const* a, double const* b, double* o) {
 	}
 }
 
-template<int N>
-double* getV() {
-	return new double[N];
-}
+double* t0 = malloc_aligned<double>(VW, 5);
+double* t1 = malloc_aligned<double>(VW, 5);
+double* t2 = malloc_aligned<double>(VW, 5);
 
-double* t0 = getV<VW>();
-double* t1 = getV<VW>();
-double* t2 = getV<VW>();
-
-double* cnd(double* X) {
+double const* cnd(double const* X) {
 	abs_op<VW>(X, t0);
 	muls_op<VW>(t0, 0.2316419, t0);
 	adds_op<VW>(t0, 1.0, t0);
 	rcp_op<VW>(t0, t0);
 
 	muls_op<VW>(t0, 1.330274429, t1);
-	/*adds_op<VW>(t1, -1.821255978, t1);
+	adds_op<VW>(t1, -1.821255978, t1);
 	mul_op<VW>(t0, t1, t1);
 	adds_op<VW>(t1, 1.781477937, t1);
 	mul_op<VW>(t0, t1, t1);
 	adds_op<VW>(t1, -0.356563782, t1);
 	mul_op<VW>(t0, t1, t1);
 	adds_op<VW>(t1, 0.31938153, t1);
-	mul_op<VW>(t0, t1, t1);*/
-	addsmul_op<VW>(-1.821255978, t0, t1);
+	mul_op<VW>(t0, t1, t1);
+	/*addsmul_op<VW>(-1.821255978, t0, t1);
 	addsmul_op<VW>(1.781477937, t0, t1);
 	addsmul_op<VW>(-0.356563782, t0, t1);
-	addsmul_op<VW>(0.31938153, t0, t1);
+	addsmul_op<VW>(0.31938153, t0, t1);*/
 	muls_op<VW>(t1, 0.39894228040, t1);
-
+	
 	mul_op<VW>(X, X, t0);
 	muls_op<VW>(t0, -0.5, t0);
 	exp_op<VW>(t0, t0);
@@ -282,9 +273,9 @@ double* cnd(double* X) {
 	return t0;
 }
 
-double* s0 = getV<VW>();
-double* s1 = getV<VW>();
-double* s2 = getV<VW>();
+double* s0 = malloc_aligned<double>(VW, 5);
+double* s1 = malloc_aligned<double>(VW, 5);
+double* s2 = malloc_aligned<double>(VW, 5);
 
 double body(double const* S, double const* X, double const* T, double const* r, double const* v) {
 
@@ -300,6 +291,8 @@ double body(double const* S, double const* X, double const* T, double const* r, 
 
 	// +
 	muladd_op<VW>(s1, T, s0);
+	//mul_op<VW>(s1, T, s1);
+	//add_op<VW>(s1, s0, s0);
 
 	// v * sqrt(T)	
 	sqrt_op<VW>(T, s1);

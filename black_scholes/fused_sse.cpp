@@ -1,9 +1,5 @@
-#include <stdlib.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdint.h>
+#include "blackscholes.h"
 #include <xmmintrin.h>
-#include "../timing.h"
 
 union ieee754_QNAN
 {
@@ -35,8 +31,8 @@ static inline __m128d _mm_blendv_pd(__m128d a, __m128d b, __m128d c) {
 
 
 
-double d_cnd[2];
-double d_body[2];
+double* d_cnd = malloc_aligned<double>(2, 5);
+double* d_body = malloc_aligned<double>(2, 5);
 
 __attribute__ ((always_inline))
 __m128d cnd(__m128d X) {
@@ -74,11 +70,11 @@ double run(double* S, double* X, double* T, double* r, double* v) {
 }
 
 int main(int argc, char** argv) {
-	double* S = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
-	double* X = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
-	double* T = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
-	double* r = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
-	double* v = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
+	double* S = malloc_aligned<double>(LENGTH, 5);
+	double* X = malloc_aligned<double>(LENGTH, 5);
+	double* T = malloc_aligned<double>(LENGTH, 5);
+	double* r = malloc_aligned<double>(LENGTH, 5);
+	double* v = malloc_aligned<double>(LENGTH, 5);
 	
 	for(int i = 0; i < LENGTH; i++) {
 		S[i] = 100;

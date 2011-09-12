@@ -1,9 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <math.h>
+#include "blackscholes.h"
 #include <immintrin.h>
-#include "../timing.h"
 
 #define VW (BLOCK) 
 
@@ -231,11 +227,11 @@ double* getV() {
 	return (double*)(((int64_t)(d+3))>>5<<5);
 }
 
-double* t0 = getV<VW>();
-double* t1 = getV<VW>();
-double* t2 = getV<VW>();
+double* t0 = malloc_aligned<double>(VW, 5);
+double* t1 = malloc_aligned<double>(VW, 5);
+double* t2 = malloc_aligned<double>(VW, 5);
 
-double* cnd(double* X) {
+double const* cnd(double const* X) {
 	abs_op<VW>(X, t0);
 	muls_op<VW>(t0, 0.2316419, t0);
 	adds_op<VW>(t0, 1.0, t0);
@@ -269,9 +265,9 @@ double* cnd(double* X) {
 	return t0;
 }
 
-double* s0 = getV<VW>();
-double* s1 = getV<VW>();
-double* s2 = getV<VW>();
+double* s0 = malloc_aligned<double>(VW, 5);
+double* s1 = malloc_aligned<double>(VW, 5);
+double* s2 = malloc_aligned<double>(VW, 5);
 
 double body(double const* S, double const* X, double const* T, double const* r, double const* v) {
 	// log(S/X)/2.302585

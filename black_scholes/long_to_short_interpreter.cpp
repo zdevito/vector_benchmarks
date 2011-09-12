@@ -4,8 +4,7 @@
 #include<string>
 #include<sstream>
 
-#define VL (256 * 256)
-#define ROUNDS 20
+#define VL (LENGTH)
 
 
 #define INTERPRETER_OPS(_) \
@@ -113,7 +112,6 @@ struct IRNode {
 	double * reg;
 };
 
-#define BLOCK_SIZE 512
 #define MAX_NODES 128
 #define MAX_INPUTS 32
 
@@ -126,7 +124,7 @@ struct Trace {
 	int n_inputs;
 	int max_size;
 	int iteration;
-	double registers[MAX_NODES][BLOCK_SIZE];
+	double registers[MAX_NODES][BLOCK];
 };
 Trace trace;
 
@@ -269,7 +267,7 @@ void op##_op(Vector* i, Value * optr) { \
 void op##_top(IRNode * node) { \
 	double * o = node->reg; \
 	double * i = trace.nodes[node->a].reg; \
-	for(int j = 0; j < BLOCK_SIZE; j++) { \
+	for(int j = 0; j < BLOCK; j++) { \
 		double a = i[j]; \
 		o[j] = impl; \
 	} \
@@ -307,7 +305,7 @@ void op##_top(IRNode * node) { \
 	double * o = node->reg; \
 	double * av = trace.nodes[node->a].reg; \
 	double * bv = trace.nodes[node->b].reg; \
-	for(int j = 0; j < BLOCK_SIZE; j++) { \
+	for(int j = 0; j < BLOCK; j++) { \
 		double a = av[j]; \
 		double b = bv[j]; \
 		o[j] = impl; \
@@ -336,7 +334,7 @@ void op##_top(IRNode * node) { \
 	double * o = node->reg; \
 	double * av = trace.nodes[node->a].reg; \
 	double b = constants[node->b]; \
-	for(int j = 0; j < BLOCK_SIZE; j++) { \
+	for(int j = 0; j < BLOCK; j++) { \
 		double a = av[j]; \
 		o[j] = impl; \
 	} \
@@ -397,7 +395,7 @@ int op##_interp(Inst * i) {\
 		trace_reserve(1,0); \
 		int v = trace_record(bc_##op,i->r,a.idx,0); \
 		Value_assign(&r,v); \
-	} else if(a.v->size > BLOCK_SIZE) { \
+	} else if(a.v->size > BLOCK) { \
 		trace_reserve(2,1); \
 		int idx = trace_input(a.v); \
 		int v = trace_record(bc_##op,i->r,idx,0); \
@@ -421,7 +419,7 @@ int op##_interp(Inst * i) {\
 			int idx = trace_input(b.v);\
 			Value_assign(&r,trace_record(bc_##op,i->r,a.idx,idx));\
 		}\
-	} else if(a.v->size > BLOCK_SIZE) {\
+	} else if(a.v->size > BLOCK) {\
 		if(b.typ == T_FUTURE) {\
 			trace_reserve(2,1);\
 			int idx = trace_input(a.v);\
@@ -437,7 +435,7 @@ int op##_interp(Inst * i) {\
 			trace_reserve(2,1);\
 			int idx = trace_input(a.v);\
 			Value_assign(&r,trace_record(bc_##op,i->r,idx,b.idx));\
-		} else if (b.v->size > BLOCK_SIZE) {\
+		} else if (b.v->size > BLOCK) {\
 			trace_reserve(3,2);\
 			int aidx = trace_input(a.v);\
 			int bidx = trace_input(b.v);\
@@ -456,7 +454,7 @@ int op##_interp(Inst * i) {\
 		trace_reserve(1,0); \
 		int v = trace_record(bc_##op,i->r,a.idx,i->b); \
 		Value_assign(&r,v); \
-	} else if(a.v->size > BLOCK_SIZE) { \
+	} else if(a.v->size > BLOCK) { \
 		trace_reserve(2,1); \
 		int idx = trace_input(a.v); \
 		int v = trace_record(bc_##op,i->r,idx,i->b); \
@@ -529,7 +527,7 @@ void trace_interp() {
 		trace.nodes[idx].reg = output_values[i]->data;
 	}
 
-	for(trace.iteration = 0; trace.iteration < trace.max_size; trace.iteration += BLOCK_SIZE) {
+	for(trace.iteration = 0; trace.iteration < trace.max_size; trace.iteration += BLOCK) {
 
 		for(int i = 0; i < trace.n_nodes; i++) {
 			IRNode & node = trace.nodes[i];
@@ -542,7 +540,7 @@ void trace_interp() {
 		//advance the output temporaries
 		for(int i = 0; i < n_outputs; i++) {
 			int idx = registers[outputs[i]].idx;
-			trace.nodes[idx].reg += BLOCK_SIZE;
+			trace.nodes[idx].reg += BLOCK;
 		}
 	}
 

@@ -1,9 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <math.h>
-
-#include "../timing.h"
+#include "blackscholes.h"
 
 // The following environment variables should be defined by the compiler:
 //	LENGTH = vector size
@@ -161,16 +156,11 @@ void sel_op(double const* s, double const* a, double const* b, double* o) {
 	}
 }
 
-template<int N>
-double* getV() {
-	return new double[N];
-}
+double* t0 = malloc_aligned<double>(VW, 5);
+double* t1 = malloc_aligned<double>(VW, 5);
+double* t2 = malloc_aligned<double>(VW, 5);
 
-double* t0 = getV<VW>();
-double* t1 = getV<VW>();
-double* t2 = getV<VW>();
-
-double* cnd(double* X) {
+double const* cnd(double const* X) {
 	abs_op<VW>(X, t0);
 	muls_op<VW>(t0, 0.2316419, t0);
 	adds_op<VW>(t0, 1.0, t0);
@@ -204,9 +194,9 @@ double* cnd(double* X) {
 	return t0;
 }
 
-double* s0 = getV<VW>();
-double* s1 = getV<VW>();
-double* s2 = getV<VW>();
+double* s0 = malloc_aligned<double>(VW, 5);
+double* s1 = malloc_aligned<double>(VW, 5);
+double* s2 = malloc_aligned<double>(VW, 5);
 
 double body(double const* S, double const* X, double const* T, double const* r, double const* v) {
 
@@ -260,11 +250,11 @@ double run(double* S, double* X, double* T, double* r, double* v) {
 
 int main(int argc, char** argv) {
 
-	double* S = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
-	double* X = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
-	double* T = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
-	double* r = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
-	double* v = (double*)((uint64_t)malloc(sizeof(double)*(LENGTH+3)) >> 5 << 5);
+	double* S = malloc_aligned<double>(LENGTH, 5);
+	double* X = malloc_aligned<double>(LENGTH, 5);
+	double* T = malloc_aligned<double>(LENGTH, 5);
+	double* r = malloc_aligned<double>(LENGTH, 5);
+	double* v = malloc_aligned<double>(LENGTH, 5);
 	
 	for(int i = 0; i < LENGTH; i++) {
 		S[i] = 100;
